@@ -5,7 +5,8 @@ todo = []
 
 @todo_bp.before_request
 def before_request():
-    authenticate_token()
+    return authenticate_token()
+
 
 
 @todo_bp.route("/", methods=["GET"])
