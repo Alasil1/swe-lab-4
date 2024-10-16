@@ -11,19 +11,15 @@ def before_request():
 
 @todo_bp.route("/", methods=["GET"])
 def get_todo():
-    return jsonify(todo), 200
+    return jsonify(todo)
 
 
 @todo_bp.route("/", methods=["POST"])
 def add_todo():
-    data = request.json
-    if not data or not 'task' in data:
-        return jsonify({"error": "Task is required"}), 400
-
     new_todo = {
         "id": len(todo) + 1,
-        "task": data["task"],
-        "done": False
+        "title": request.json.get("title"),
+        "completed": request.json.get("completed",False),
     }
     todo.append(new_todo)
     return jsonify(new_todo), 201
@@ -31,26 +27,18 @@ def add_todo():
 
 @todo_bp.route("/<int:todo_id>", methods=["PUT"])
 def update_todo(todo_id):
-    data = request.json
     task_to_update = next((t for t in todo if t['id'] == todo_id), None)
-
     if not task_to_update:
         return jsonify({"error": "Todo not found"}), 404
-    if 'task' in data:
-        task_to_update['task'] = data['task']
-    if 'done' in data:
-        task_to_update['done'] = data['done']
+    task_to_update["title"] = request.json.get("title",task_to_update["title"])
+    task_to_update["completed"] = request.json.get("completed",task_to_update["completed"])
 
-    return jsonify(task_to_update), 200
+
+    return jsonify(task_to_update)
 
 
 @todo_bp.route("/<int:todo_id>", methods=["DELETE"])
 def delete_todo(todo_id):
     global todo
-    task_to_delete = next((t for t in todo if t['id'] == todo_id), None)
-
-    if not task_to_delete:
-        return jsonify({"error": "Todo not found"}), 404
-
     todo = [t for t in todo if t['id'] != todo_id]
     return jsonify({"message": "Todo deleted"}), 204
