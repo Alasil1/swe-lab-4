@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from middleware.auth import authenticate_token
-
 todo_bp = Blueprint("todo", __name__)
 todo = []  
 
@@ -13,6 +12,10 @@ def before_request():
 def get_todo():
     return jsonify(todo)
 
+@app.route('/tasks/<int:task_id>', methods=['GET'])
+def get_task(task_id):
+    task = next((task for task in tasks if task["id"] == task_id), None)
+    return jsonify(task)
 
 @todo_bp.route("/", methods=["POST"])
 def add_todo():
